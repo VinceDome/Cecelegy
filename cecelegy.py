@@ -694,6 +694,10 @@ async def clear(ctx, msgs):
             await ctx.send("számot adj meg lol")
     else:
         await ctx.send("nem")
+
+@client.command(aliases=["git"])
+async def github(ctx):
+    await ctx.send("https://github.com/VinceDome/Cecelegy")
 #endregion
 
 
