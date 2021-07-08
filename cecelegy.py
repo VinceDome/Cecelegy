@@ -25,7 +25,7 @@ def tobool(boolean):
 
 
 
-settings = open(os.getcwd()+"\\cecelegy\\settings.txt", "r", encoding="utf-8")
+settings = open(os.getcwd()+"/cecelegy/settings.txt", "r", encoding="utf-8")
 settingsR = settings.read().split("+++")
 settings.close()
 newday = datetime.datetime.strptime(settingsR[0], '%Y-%m-%d %H:%M:%S')
@@ -33,7 +33,7 @@ newday = datetime.datetime.strptime(settingsR[0], '%Y-%m-%d %H:%M:%S')
 
 
 
-data = open(os.getcwd()+"\\cecelegy\\data.txt", "r", encoding="utf-8")
+data = open(os.getcwd()+"/cecelegy/data.txt", "r", encoding="utf-8")
 dataR = data.read().split("\n")
 pfpcycle = tobool(dataR[0])
 watch = tobool(dataR[1])
@@ -43,14 +43,14 @@ print(f"Pfpcycle = {pfpcycle}\nWatch = {watch}")
 data.close()
 
 #defbannedwordsL
-banned_wordsF = open(os.getcwd()+"\\cecelegy\\banned_words.txt", "r", encoding="utf-8")
+banned_wordsF = open(os.getcwd()+"/cecelegy/banned_words.txt", "r", encoding="utf-8")
 banned_wordsL = banned_wordsF.read().split("\n")
 if banned_wordsL == [""]:
     banned_wordsL = []
 banned_wordsF.close()
 
 
-remindF = open(os.getcwd()+"\\cecelegy\\reminder.txt", "r", encoding="utf-8")
+remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "r", encoding="utf-8")
 remindR = remindF.read().split("\n")
 remindF.close()
 remindR_dupe = remindR[:]
@@ -169,7 +169,7 @@ async def crash(ctx):
 async def napivers(ctx):
     global newday
     if datetime.datetime.now() > newday:
-        versek = open(os.getcwd()+"\\cecelegy\\versek copy.txt", 'r', encoding='utf-8')
+        versek = open(os.getcwd()+"/cecelegy/versek copy.txt", 'r', encoding='utf-8')
         verslista = versek.read().split("%%%")
         versek.close()
 
@@ -186,15 +186,15 @@ async def napivers(ctx):
             newday += datetime.timedelta(days=3)
         else:
             newday += datetime.timedelta(days=1)
-        os.remove(os.getcwd()+"\\cecelegy\\settings.txt")
+        os.remove(os.getcwd()+"/cecelegy/settings.txt")
         
 
-        settings = open(os.getcwd()+"\\cecelegy\\settings.txt", "a+", encoding="utf-8")
+        settings = open(os.getcwd()+"/cecelegy/settings.txt", "a+", encoding="utf-8")
         settings.write(str(newday)+"+++"+chosen_poem)
         settings.close()
 
-        os.remove(os.getcwd()+"\\cecelegy\\versek copy.txt")
-        versek = open(os.getcwd()+"\\cecelegy\\versek copy.txt", "a+", encoding="utf-8")
+        os.remove(os.getcwd()+"/cecelegy/versek copy.txt")
+        versek = open(os.getcwd()+"/cecelegy/versek copy.txt", "a+", encoding="utf-8")
         for i in verslista:
             versek.write(i)
             if i != verslista[len(verslista)-1]:
@@ -208,7 +208,7 @@ async def napivers(ctx):
             await ctx.send("Nincs mit küldeni :(")
 
     else:
-        settings = open(os.getcwd()+"\\cecelegy\\settings.txt", "r", encoding='utf-8')
+        settings = open(os.getcwd()+"/cecelegy/settings.txt", "r", encoding='utf-8')
         settingsR = settings.read().split("+++")
         settings.close()
         try:
@@ -344,21 +344,21 @@ async def remind(ctx, *args):
         else:
             await ctx.send(f"""{person}, here's a reminder for you: "{reminder_message}" (set up by {ctx.author.mention})""")
     else:
-        remindF = open(os.getcwd()+"\\cecelegy\\reminder.txt", "r", encoding="utf-8")
+        remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "r", encoding="utf-8")
         remindFR = remindF.read()
         remindF.close()
 
         if remindFR != "" and remindFR != " ":
-            remindF = open(os.getcwd()+"\\cecelegy\\reminder.txt", "a+", encoding="utf-8")
+            remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "a+", encoding="utf-8")
             remindF.write("\n")
             remindF.close()
 
-        remindF = open(os.getcwd()+"\\cecelegy\\reminder.txt", "a+", encoding="utf-8")
+        remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "a+", encoding="utf-8")
         remind_date = datetime.datetime.now() + datetime.timedelta(seconds = final_seconds)
         remindF.write(f"{person}%%%{remind_date}%%%{ctx.author.id}%%%{ctx.channel.id}%%%{reminder_message}")
         remindF.close()
 
-        remindF = open(os.getcwd()+"\\cecelegy\\reminder.txt", "r", encoding="utf-8")
+        remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "r", encoding="utf-8")
         remindR = remindF.read().split("\n")
         remindF.close()
         remindR_dupe = remindR[:]      
@@ -396,8 +396,8 @@ async def cycle(ctx):
         else:
             pfpcycle = True
         
-        os.remove(os.getcwd()+"\\cecelegy\\data.txt")
-        data = open(os.getcwd()+"\\cecelegy\\data.txt", "a+")
+        os.remove(os.getcwd()+"/cecelegy/data.txt")
+        data = open(os.getcwd()+"/cecelegy/data.txt", "a+")
         data.write(f"{pfpcycle}\n{watch}\n{theme_color}")
         data.close()
         await ctx.send(f"Changed pfp cycle to {pfpcycle}.")
@@ -424,7 +424,7 @@ async def settheme(ctx, *args):
         avatar_changed = False
         if args[0] == "og":
             if avatar:
-                pfp = open(os.getcwd()+"\\pfps\\og_cecelegy.png", "rb")
+                pfp = open(os.getcwd()+"/pfps/og_cecelegy.png", "rb")
                 try:
                     await client.user.edit(avatar = pfp.read())
                     avatar_changed = True
@@ -436,7 +436,7 @@ async def settheme(ctx, *args):
 
         elif args[0] == "gold":
             if avatar:
-                pfp = open(os.getcwd()+"\\pfps\\golden_cecelegy.png", "rb")
+                pfp = open(os.getcwd()+"/pfps/golden_cecelegy.png", "rb")
                 try:
                     await client.user.edit(avatar = pfp.read())
                     avatar_changed = True
@@ -447,7 +447,7 @@ async def settheme(ctx, *args):
             
         elif args[0] == "tür":
             if avatar:
-                pfp = open(os.getcwd()+"\\pfps\\türkiz_cecelegy.png", "rb")
+                pfp = open(os.getcwd()+"/pfps/türkiz_cecelegy.png", "rb")
                 try:
                     await client.user.edit(avatar = pfp.read())
                     avatar_changed = True
@@ -459,7 +459,7 @@ async def settheme(ctx, *args):
             
         elif args[0] == "rw":
             if avatar:
-                pfp = open(os.getcwd()+"\\pfps\\redwhite_cecelegy.png", "rb")
+                pfp = open(os.getcwd()+"/pfps/redwhite_cecelegy.png", "rb")
                 try:
                     await client.user.edit(avatar = pfp.read())
                     avatar_changed = True
@@ -471,7 +471,7 @@ async def settheme(ctx, *args):
         
         elif args[0] == "dc":
             if avatar:
-                pfp = open(os.getcwd()+"\\pfps\\blurple_cecelegy.png", "rb")
+                pfp = open(os.getcwd()+"/pfps/blurple_cecelegy.png", "rb")
                 try:
                     await client.user.edit(avatar = pfp.read())
                     avatar_changed = True
@@ -482,8 +482,8 @@ async def settheme(ctx, *args):
             theme_color = 5793266
         
         await cece_role.edit(colour=theme_color)
-        os.remove(os.getcwd()+"\\cecelegy\\data.txt")
-        data = open(os.getcwd()+"\\cecelegy\\data.txt", "a+", encoding="utf-8")
+        os.remove(os.getcwd()+"/cecelegy/data.txt")
+        data = open(os.getcwd()+"/cecelegy/data.txt", "a+", encoding="utf-8")
         data.write(f"{pfpcycle}\n{watch}\n{theme_color}")
         data.close()
         if avatar_changed:
@@ -495,7 +495,7 @@ async def settheme(ctx, *args):
 
 @client.command()
 async def suggest(ctx, *args):
-    suggestions = open(os.getcwd()+"\\cecelegy\\suggestions.txt", "a+", encoding="utf-8")
+    suggestions = open(os.getcwd()+"/cecelegy/suggestions.txt", "a+", encoding="utf-8")
     suggestions.write(f"""\n[{" ".join(args)}], suggested by: {ctx.author}""")
     suggestions.close()
     await ctx.send(f"""Suggested [{" ".join(args)}] to <@!810910872792596550>""")
@@ -538,13 +538,13 @@ async def timeleft(ctx):
 async def refresh(ctx):
     if ctx.author.id == 810910872792596550:
         global remindR, remindR_dupe, banned_wordsL
-        remindF = open(os.getcwd()+"\\cecelegy\\reminder.txt", "r", encoding="utf-8")
+        remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "r", encoding="utf-8")
         remindR = remindF.read().split("\n")
         remindF.close()
         remindR_dupe = remindR[:]
 
         
-        banned_wordsF = open(os.getcwd()+"\\cecelegy\\banned_words.txt", "r", encoding="utf-8")
+        banned_wordsF = open(os.getcwd()+"/cecelegy/banned_words.txt", "r", encoding="utf-8")
         banned_wordsL = banned_wordsF.read().split("\n")
         if banned_wordsL == [""]:
             banned_wordsL = []
@@ -584,8 +584,8 @@ async def _watch(ctx):
         else:
             watch = True
         
-        os.remove(os.getcwd()+"\\cecelegy\\data.txt")
-        data = open(os.getcwd()+"\\cecelegy\\data.txt", "a+")
+        os.remove(os.getcwd()+"/cecelegy/data.txt")
+        data = open(os.getcwd()+"/cecelegy/data.txt", "a+")
         data.write(f"{pfpcycle}\n{watch}")
         data.close()
         print(f"--------------------\nChanged watch to {watch}\n--------------------")
@@ -735,8 +735,8 @@ async def remind_timer():
         if remindR_dupe == remindR:
             return None
         else:
-            os.remove(os.getcwd()+"\\cecelegy\\reminder.txt")
-            remindW = open(os.getcwd()+"\\cecelegy\\reminder.txt", "a+", encoding="utf-8")
+            os.remove(os.getcwd()+"/cecelegy/reminder.txt")
+            remindW = open(os.getcwd()+"/cecelegy/reminder.txt", "a+", encoding="utf-8")
             for i in remindR_dupe:
                 if i == remindR_dupe[0]:
                     remindW.write(i)
@@ -745,7 +745,7 @@ async def remind_timer():
             remindW.close()
 
             
-            remindF = open(os.getcwd()+"\\cecelegy\\reminder.txt", "r", encoding="utf-8")
+            remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "r", encoding="utf-8")
             remindR = remindF.read().split("\n")
             remindF.close()
             remindR_dupe = remindR[:]
