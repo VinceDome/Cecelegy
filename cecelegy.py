@@ -1,8 +1,15 @@
-import os, discord, time, datetime, random, asyncio, math
+import os, discord, time, datetime, random, asyncio, math, sys
 
 from discord.ext import commands, tasks
-from cece_token import *
 from discord.utils import get
+
+path_to_tokenL = os.getcwd().split("\\")
+if len(path_to_tokenL) == 1:
+    path_to_tokenL = os.getcwd().split("/")
+del path_to_tokenL[len(path_to_tokenL)-1]
+
+sys.path.append("/".join(path_to_tokenL))
+from cece_token import *
 
 testing_mode = False
 client = commands.Bot(command_prefix="?", case_insensitive = True)
