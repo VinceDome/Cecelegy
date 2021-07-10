@@ -2,6 +2,7 @@ import os, discord, time, datetime, random, asyncio, math, sys
 
 from discord.ext import commands, tasks
 from discord.utils import get
+from discord import FFmpegPCMAudio
 
 path_to_tokenL = os.getcwd().split("\\")
 if len(path_to_tokenL) == 1:
@@ -720,6 +721,50 @@ async def dm(ctx, _id, *, message):
     await ctx.send(f"""Dm-d "{message}" to {user}""")
 
 
+
+@client.command(pass_context=True)
+async def join(ctx, _id=None):
+    if _id == None:
+        if not ctx.author.voice:
+            await ctx.send("nem")
+            return None
+
+        vChannel = ctx.author.voice.channel
+        
+    else:
+        try:
+            _id = int(_id)
+        except ValueError:
+            await ctx.send("számot kérek bruh")
+            return None
+        vChannel = client.get_channel(int(_id))
+    
+    await vChannel.connect()
+    await ctx.send("csatlakoztam")
+
+@client.command(pass_context=True)
+async def leave(ctx):
+    if not ctx.voice_client:
+        await ctx.send("honnan a fenéből lépjek ki")
+        return None
+
+    await ctx.voice_client.disconnect()
+    await ctx.send("kiléptem")
+
+@client.command(pass_context=True)
+async def play(ctx, _file=None):
+    if not ctx.voice_client:
+        await ctx.send("hova a fenébe játsszam le")
+        return None
+
+    if _file == None or not os.path.exists(os.getcwd()+f"/audio_files/{_file}.wav"):
+        await ctx.send("adj meg egy létező fájlnevet bruh")
+        return None
+    
+    voice = ctx.voice_client
+    source = FFmpegPCMAudio(source=os.getcwd()+f"/audio_files/{_file}.wav")
+    voice.play(source)
+    await ctx.send(f"""playing "{_file}.wav" """)
 #endregion
 
 
