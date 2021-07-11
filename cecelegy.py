@@ -3,7 +3,9 @@ import os, discord, time, datetime, random, asyncio, math, sys
 from discord.ext import commands, tasks
 from discord.utils import get
 from discord import FFmpegPCMAudio
+import youtube_dl
 
+#importing the token
 path_to_tokenL = os.getcwd().split("\\")
 if len(path_to_tokenL) == 1:
     path_to_tokenL = os.getcwd().split("/")
@@ -751,20 +753,90 @@ async def leave(ctx):
     await ctx.voice_client.disconnect()
     await ctx.send("kiléptem")
 
-@client.command(pass_context=True)
-async def play(ctx, _file=None):
+@client.command(pass_context=True, aliases = ["play"])
+async def _play(ctx, _path=None):
+    edit_msg = []
+    msg = None
     if not ctx.voice_client:
-        await ctx.send("hova a fenébe játsszam le")
-        return None
+        if not ctx.author.voice:
+            await ctx.send("nem")
+            return None
+        msg = await ctx.send("Joining voice channel...")
+        edit_msg.append("Joining voice channel...")
+        vChannel = ctx.author.voice.channel
+        await vChannel.connect()
+        edit_msg.append("DONE\n")
+        await msg.edit(content="".join(edit_msg))
 
-    if _file == None or not os.path.exists(os.getcwd()+f"/audio_files/{_file}.wav"):
+    voice = ctx.voice_client
+
+    if "https:" in _path:
+        ydl_opts = {
+        "format": "bestaudio/best",
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "192",
+            }],
+        }
+
+        edit_msg.append("Downloading video...")
+        if not msg:
+            msg = await ctx.send("".join(edit_msg))
+        else:
+            await msg.edit(content="".join(edit_msg))
+        
+
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            try:
+                ydl.download([_path])
+            except:
+                edit_msg.append("FAILED, check your link again!")
+                await msg.edit(content="".join(edit_msg))
+                return None
+
+        edit_msg.append("DONE\nRenaming file...")
+        await msg.edit(content="".join(edit_msg))
+
+
+        for file in os.listdir("./"):
+            if file.endswith(".mp3"):
+                if os.path.exists(os.getcwd()+"/tmp/song.mp3"):
+                    os.remove(os.getcwd()+"/tmp/song.mp3")
+
+                os.rename(os.getcwd()+"/"+file, os.getcwd()+f"/tmp/song.mp3")
+                break
+        else:
+            edit_msg.append("FAILED, check your link again!")
+            await msg.edit(content="".join(edit_msg))
+            return None
+        
+        edit_msg.append("DONE\nStarting playback...")
+        await msg.edit(content="".join(edit_msg))
+
+        
+
+        source = FFmpegPCMAudio(source=os.getcwd()+f"/tmp/song.mp3")
+        voice.play(source)
+
+        edit_msg.append(f"PLAYING {_path}")
+        await msg.edit(content="".join(edit_msg))
+        
+
+      
+
+    elif os.path.exists(os.getcwd()+f"/audio_files/{_path}.wav"):
+        source = FFmpegPCMAudio(source=os.getcwd()+f"/audio_files/{_path}.wav")
+        voice.play(source)
+        await ctx.send(f"""Playing "{_path}.wav" """)
+
+    else:   
         await ctx.send("adj meg egy létező fájlnevet bruh")
         return None
     
-    voice = ctx.voice_client
-    source = FFmpegPCMAudio(source=os.getcwd()+f"/audio_files/{_file}.wav")
-    voice.play(source)
-    await ctx.send(f"""playing "{_file}.wav" """)
+    
+    
+    
 #endregion
 
 
