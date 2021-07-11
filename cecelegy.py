@@ -791,7 +791,7 @@ async def _play(ctx, _path=None, _channel=None):
         FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
         YDL_OPTIONS = {'format': 'bestaudio/best', 'noplaylist':'True'}
 
-        voice = get(client.voice_clients, guild=ctx.guild)
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
         try:
             with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(_path, download=False)
@@ -804,6 +804,29 @@ async def _play(ctx, _path=None, _channel=None):
 
         edit_msg.append("PLAYING")
         await msg.edit(content="".join(edit_msg))
+        tmp_channel = ctx.voice_client.channel
+        
+        #this patches audio stopping when moving bot to channels
+        while True:
+            await asyncio.sleep(0.5)
+            if ctx.voice_client.channel == None:
+                break
+            elif ctx.voice_client.channel != tmp_channel:
+                if len(ctx.voice_client.channel.members) != 1:
+                    tmp_channel = ctx.voice_client.channel
+                    continue
+                try:
+                    voice.pause()
+                except:
+                    break
+                await asyncio.sleep(0.5)
+                voice.resume()
+                tmp_channel = ctx.voice_client.channel
+                
+
+
+
+
 
         """
         ydl_opts = {
@@ -868,6 +891,25 @@ async def _play(ctx, _path=None, _channel=None):
         source = FFmpegPCMAudio(source=os.getcwd()+f"/audio_files/{_path}.wav")
         voice.play(source)
         await ctx.send(f"""Playing "{_path}.wav" """)
+
+
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        #this patches audio stopping when moving bot to channels
+        while True:
+            await asyncio.sleep(0.5)
+            if ctx.voice_client.channel == None:
+                break
+            elif ctx.voice_client.channel != tmp_channel:
+                if len(ctx.voice_client.channel.members) != 1:
+                    tmp_channel = ctx.voice_client.channel
+                    continue
+                try:
+                    voice.pause()
+                except:
+                    break
+                await asyncio.sleep(0.5)
+                voice.resume()
+                tmp_channel = ctx.voice_client.channel
 
     else:   
         edit_msg.append("FAILED, I need a valid filename!")
