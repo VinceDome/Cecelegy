@@ -742,7 +742,7 @@ async def join(ctx, _id=None):
         vChannel = client.get_channel(int(_id))
     
     await vChannel.connect()
-    await ctx.send("csatlakoztam")
+    await ctx.send(f"""Joined "{vChannel.name}" """)
 
 @client.command(pass_context=True)
 async def leave(ctx):
@@ -754,7 +754,7 @@ async def leave(ctx):
     await ctx.send("kiléptem")
 
 @client.command(pass_context=True, aliases = ["play"])
-async def _play(ctx, _path=None):
+async def _play(ctx, _path=None, _channel=None):
     edit_msg = []
     msg = None
     if not ctx.voice_client:
@@ -775,7 +775,7 @@ async def _play(ctx, _path=None):
         "format": "bestaudio/best",
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
-            "preferredcodec": "mp3",
+            "preferredcodec": "wav",
             "preferredquality": "192",
             }],
         }
@@ -800,11 +800,11 @@ async def _play(ctx, _path=None):
 
 
         for file in os.listdir("./"):
-            if file.endswith(".mp3"):
-                if os.path.exists(os.getcwd()+"/tmp/song.mp3"):
-                    os.remove(os.getcwd()+"/tmp/song.mp3")
+            if file.endswith(".wav"):
+                if os.path.exists(os.getcwd()+"/tmp/song.wav"):
+                    os.remove(os.getcwd()+"/tmp/song.wav")
 
-                os.rename(os.getcwd()+"/"+file, os.getcwd()+f"/tmp/song.mp3")
+                os.rename(os.getcwd()+"/"+file, os.getcwd()+f"/tmp/song.wav")
                 break
         else:
             edit_msg.append("FAILED, check your link again!")
@@ -816,7 +816,7 @@ async def _play(ctx, _path=None):
 
         
 
-        source = FFmpegPCMAudio(source=os.getcwd()+f"/tmp/song.mp3")
+        source = FFmpegPCMAudio(source=os.getcwd()+f"/tmp/song.wav")
         voice.play(source)
 
         edit_msg.append(f"PLAYING {_path}")
@@ -834,6 +834,59 @@ async def _play(ctx, _path=None):
         await ctx.send("adj meg egy létező fájlnevet bruh")
         return None
     
+@client.command(pass_context=True, aliases = ["download", "save"])
+async def _download(ctx, _url=None, _name=None):
+    if not _url or not "https://" in _url or not _name:
+        return None
+    edit_msg = []
+    msg = None
+
+    ydl_opts = {
+        "format": "bestaudio/best",
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "wav",
+            "preferredquality": "192",
+            }],
+        }
+
+    edit_msg.append("Downloading video...")
+    msg = await ctx.send("".join(edit_msg))
+    
+    
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        try:
+            ydl.download([_url])
+        except:
+            edit_msg.append("FAILED, check your link again!")
+            await msg.edit(content="".join(edit_msg))
+            return None
+
+    edit_msg.append("DONE\nRenaming file...")
+    await msg.edit(content="".join(edit_msg))
+
+
+    for file in os.listdir("./"):
+        if file.endswith(".wav"):
+            try:
+                os.rename(os.getcwd()+"/"+file, os.getcwd()+f"/audio_files/{_name}.wav")
+            except:
+                edit_msg.append("FAILED, file already exists!")
+                await msg.edit(content="".join(edit_msg))
+                return None
+
+            break
+    else:
+        edit_msg.append("FAILED, check your link again!")
+        await msg.edit(content="".join(edit_msg))
+        return None
+    
+    edit_msg.append(f"""DONE, saved as "{_name}.wav" """)
+    await msg.edit(content="".join(edit_msg))
+
+    
+
     
     
     
