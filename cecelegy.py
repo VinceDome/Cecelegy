@@ -1,3 +1,5 @@
+#region initialization
+
 import os, discord, time, datetime, random, asyncio, math, sys
 
 from discord.ext import commands, tasks
@@ -57,6 +59,10 @@ remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "r", encoding="utf-8")
 remindR = remindF.read().split("\n")
 remindF.close()
 remindR_dupe = remindR[:]
+
+
+#endregion
+
 
 @client.event
 async def on_ready():
@@ -722,8 +728,9 @@ async def dm(ctx, _id, *, message):
     await msg_dm.send(message)
     await ctx.send(f"""Dm-d "{message}" to {user}""")
 
+#endregion
 
-
+#region voice commands
 @client.command(pass_context=True)
 async def join(ctx, _id=None):
     if _id == None:
@@ -751,12 +758,13 @@ async def leave(ctx):
         return None
 
     await ctx.voice_client.disconnect()
-    await ctx.send("kiléptem")
+    await ctx.send("Left channel!")
 
 @client.command(pass_context=True, aliases = ["play"])
 async def _play(ctx, _path=None, _channel=None):
     edit_msg = []
     msg = None
+    just_joined = False
     if not ctx.voice_client:
         if not ctx.author.voice:
             await ctx.send("nem")
@@ -767,10 +775,37 @@ async def _play(ctx, _path=None, _channel=None):
         await vChannel.connect()
         edit_msg.append("DONE\n")
         await msg.edit(content="".join(edit_msg))
+        just_joined = True
 
     voice = ctx.voice_client
 
     if "https:" in _path:
+        edit_msg.append("Setting up player...")
+        if not msg:
+            msg = await ctx.send("".join(edit_msg))
+        else:
+            await msg.edit(content="".join(edit_msg))
+        
+
+
+        FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+        YDL_OPTIONS = {'format': 'bestaudio/best', 'noplaylist':'True'}
+
+        voice = get(client.voice_clients, guild=ctx.guild)
+        try:
+            with youtube_dl.YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(_path, download=False)
+                I_URL = info['formats'][0]['url']
+                source = await discord.FFmpegOpusAudio.from_probe(I_URL, **FFMPEG_OPTIONS)
+                voice.play(source)
+        except:
+            edit_msg.append("FAILED, check your link again!")
+            await msg.edit(content="".join(edit_msg))
+
+        edit_msg.append("PLAYING")
+        await msg.edit(content="".join(edit_msg))
+
+        """
         ydl_opts = {
         "format": "bestaudio/best",
         "postprocessors": [{
@@ -788,6 +823,10 @@ async def _play(ctx, _path=None, _channel=None):
         
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(_path, download=False)
+            I_URL = info['formats'][0]['url']
+            print(info)
+            print("________________________________________________________________________________________________", I_URL)
             try:
                 ydl.download([_path])
             except:
@@ -821,7 +860,7 @@ async def _play(ctx, _path=None, _channel=None):
 
         edit_msg.append(f"PLAYING {_path}")
         await msg.edit(content="".join(edit_msg))
-        
+        """
 
       
 
@@ -831,9 +870,49 @@ async def _play(ctx, _path=None, _channel=None):
         await ctx.send(f"""Playing "{_path}.wav" """)
 
     else:   
-        await ctx.send("adj meg egy létező fájlnevet bruh")
+        edit_msg.append("FAILED, I need a valid filename!")
+        await msg.edit(content="".join(edit_msg))
+        if just_joined:
+            await ctx.voice_client.disconnect()
         return None
-    
+
+@client.command(pass_context=True)
+async def pause(ctx):
+    voice = discord.utils.get(client.voice_clients, guild = ctx.guild)
+    if not voice:
+        await ctx.send("Nothing to resume <:bruh:836913355359780874>")
+        return None
+
+    if voice.is_playing():
+        voice.pause()
+        await ctx.send("Paused audio!")
+    else:
+        await ctx.send("Nothing to pause <:bruh:836913355359780874>")
+
+@client.command(pass_context=True)
+async def resume(ctx):
+    voice = discord.utils.get(client.voice_clients, guild = ctx.guild)
+    if not voice:
+        await ctx.send("Nothing to resume <:bruh:836913355359780874>")
+        return None
+
+    if voice.is_paused():
+        voice.resume()
+        await ctx.send("Resumed audio!")
+    else:
+        await ctx.send("Nothing to resume <:bruh:836913355359780874>")
+
+@client.command(pass_context=True)
+async def stop(ctx):
+    voice = discord.utils.get(client.voice_clients, guild = ctx.guild)
+    if not voice:
+        await ctx.send("Nothing to stpp <:bruh:836913355359780874>")
+        return None
+
+    voice.stop()
+    await ctx.send("Stopped audio!")
+
+
 @client.command(pass_context=True, aliases = ["download", "save"])
 async def _download(ctx, _url=None, _name=None):
     if not _url or not "https://" in _url or not _name:
@@ -884,23 +963,12 @@ async def _download(ctx, _url=None, _name=None):
     
     edit_msg.append(f"""DONE, saved as "{_name}.wav" """)
     await msg.edit(content="".join(edit_msg))
-
-    
-
     
     
+
     
-#endregion
-
-
-
-
-
-#region game commands
-
-
-
-
+    
+    
 #endregion
 
 
@@ -949,9 +1017,6 @@ async def remind_timer():
         return None
 
 
-
-
-    
 
 
 @client.event
