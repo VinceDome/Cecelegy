@@ -722,7 +722,7 @@ async def dm(ctx, _id, *, message):
             _idL.remove("!")
         except ValueError:
             pass
-    _id = int("".join(_idL))
+        _id = int("".join(_idL))
     user = await client.fetch_user(int(_id))
     msg_dm = await user.create_dm()
     await msg_dm.send(message)
@@ -762,19 +762,42 @@ async def leave(ctx):
 
 @client.command(pass_context=True, aliases = ["play"])
 async def _play(ctx, _path=None, _channel=None):
+    audio = discord.utils.get(client.voice_clients, guild = ctx.guild)
+    if audio:
+        audio.stop()
+
     edit_msg = []
     msg = None
     just_joined = False
+
+    #if bot is not connected
     if not ctx.voice_client:
-        if not ctx.author.voice:
+
+       #and the person has given a channel 
+        if _channel:
+                try:
+                    _channel = int(_channel)
+                except ValueError:
+                    await ctx.send("Enter a number!")
+                vChannel = client.get_channel(int(_channel))
+
+        #if the author is not connected
+        elif ctx.author.voice:
+            vChannel = ctx.author.voice.channel
+        #if the author is connected
+        else:
             await ctx.send("nem")
             return None
+            
+
+
         msg = await ctx.send("Joining voice channel...")
-        edit_msg.append("Joining voice channel...")
-        vChannel = ctx.author.voice.channel
+        edit_msg.append("Joining voice channel...")        
         await vChannel.connect()
+
         edit_msg.append("DONE\n")
         await msg.edit(content="".join(edit_msg))
+
         just_joined = True
 
     voice = ctx.voice_client
@@ -801,6 +824,7 @@ async def _play(ctx, _path=None, _channel=None):
         except:
             edit_msg.append("FAILED, check your link again!")
             await msg.edit(content="".join(edit_msg))
+            return None
 
         edit_msg.append("PLAYING")
         await msg.edit(content="".join(edit_msg))
@@ -809,7 +833,7 @@ async def _play(ctx, _path=None, _channel=None):
         #this patches audio stopping when moving bot to channels
         while True:
             await asyncio.sleep(0.5)
-            if ctx.voice_client.channel == None:
+            if ctx.voice_client == None:
                 break
             elif ctx.voice_client.channel != tmp_channel:
                 if len(ctx.voice_client.channel.members) != 1:
@@ -894,10 +918,11 @@ async def _play(ctx, _path=None, _channel=None):
 
 
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        tmp_channel = ctx.voice_client.channel
         #this patches audio stopping when moving bot to channels
         while True:
             await asyncio.sleep(0.5)
-            if ctx.voice_client.channel == None:
+            if ctx.voice_client == None:
                 break
             elif ctx.voice_client.channel != tmp_channel:
                 if len(ctx.voice_client.channel.members) != 1:
@@ -954,16 +979,17 @@ async def stop(ctx):
     voice.stop()
     await ctx.send("Stopped audio!")
 
-
 @client.command(pass_context=True, aliases = ["download", "save"])
 async def _download(ctx, _url=None, _name=None):
     if not _url or not "https://" in _url or not _name:
+        await ctx.send("Please give the correct parameters!")
         return None
     edit_msg = []
     msg = None
 
     ydl_opts = {
         "format": "bestaudio/best",
+        "max_filesize": 33350000,
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "wav",
@@ -975,7 +1001,6 @@ async def _download(ctx, _url=None, _name=None):
     msg = await ctx.send("".join(edit_msg))
     
     
-
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         try:
             ydl.download([_url])
@@ -983,6 +1008,14 @@ async def _download(ctx, _url=None, _name=None):
             edit_msg.append("FAILED, check your link again!")
             await msg.edit(content="".join(edit_msg))
             return None
+
+    for file in os.listdir("./"):
+            if file.endswith(".part"):
+                os.remove(file)
+                edit_msg.append("FAILED\nNOTE: The max video length is around 30 minutes")
+                await msg.edit(content="".join(edit_msg))
+                return None
+                
 
     edit_msg.append("DONE\nRenaming file...")
     await msg.edit(content="".join(edit_msg))
@@ -1005,8 +1038,14 @@ async def _download(ctx, _url=None, _name=None):
     
     edit_msg.append(f"""DONE, saved as "{_name}.wav" """)
     await msg.edit(content="".join(edit_msg))
-    
-    
+
+@client.command(pass_context=True, aliases = ["audio_files", "list"])
+async def _audio_files(ctx):
+    edit_msg = []
+    for i in os.listdir(os.getcwd()+"/audio_files/"):
+        edit_msg.append(f""""{i}"\n""")
+
+    await ctx.send("".join(edit_msg))   
 
     
     
