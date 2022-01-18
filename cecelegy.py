@@ -1,8 +1,9 @@
 #region initialization
 
-import os, discord, time, datetime, random, asyncio, math, sys
+import os, discord, time, datetime, random, asyncio, math, sys, win32api, win32con, keyboard
 
 from discord.ext import commands, tasks
+from discord.ui import Button, View
 from discord.utils import get
 from discord import FFmpegPCMAudio
 import youtube_dl
@@ -93,7 +94,7 @@ async def help(ctx):
 
 @help.command()
 async def hello(ctx):
-    embed = discord.Embed(title="Help", description = "The bot replies to you!", color=ctx.author.color)
+    embed = discord.Embed(title="Help", description = "The bot replies to you!", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?hello")
     
@@ -101,7 +102,7 @@ async def hello(ctx):
 
 @help.command()
 async def crash(ctx):
-    embed = discord.Embed(title="Help", description = "Crashes the bot, only usable by <@!810910872792596550>", color=ctx.author.color)
+    embed = discord.Embed(title="Help", description = "Crashes the bot, only usable by <@!810910872792596550>", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?crash")
     
@@ -109,7 +110,7 @@ async def crash(ctx):
 
 @help.command()
 async def napivers(ctx):
-    embed = discord.Embed(title="Help", description = "Every day a new poem written by you is chosen, use this to see this poem!", color=ctx.author.color)
+    embed = discord.Embed(title="Help", description = "Every day a new poem written by you is chosen, use this to see this poem!", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?napvers")
     
@@ -117,7 +118,7 @@ async def napivers(ctx):
 
 @help.command(aliases = ["random"])
 async def _random(ctx):
-    embed = discord.Embed(title="Help", description = "Sends a random number between (including) the two numbers you send!", color=ctx.author.color)
+    embed = discord.Embed(title="Help", description = "Sends a random number between (including) the two numbers you send!", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?random <first_number> <second_number>")
     
@@ -125,7 +126,7 @@ async def _random(ctx):
 
 @help.command()
 async def coinflip(ctx):
-    embed = discord.Embed(title="Help", description = "Flip a coin!", color=ctx.author.color)
+    embed = discord.Embed(title="Help", description = "Flip a coin!", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?coinflip")
     
@@ -133,7 +134,7 @@ async def coinflip(ctx):
 
 @help.command()
 async def remind(ctx):
-    embed = discord.Embed(title="Help", description = "Set a reminder to yourself or someone else!", color=5793266)
+    embed = discord.Embed(title="Help", description = "Set a reminder to yourself or someone else!", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?remind <person> <?d-?h-?m-?s> <message>")
 
@@ -143,7 +144,7 @@ async def remind(ctx):
 
 @help.command()
 async def gun(ctx):
-    embed = discord.Embed(title="Help", description = "Assert dominance!", color=ctx.author.color)
+    embed = discord.Embed(title="Help", description = "Assert dominance!", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?gun <person>")
     
@@ -159,10 +160,12 @@ async def hello(ctx):
     await ctx.send("SZIA TE GECHI")
 
 @client.command(aliases=["szpík", "s"])
-async def speak(ctx, *args):
+async def speak(ctx, *, args):
     if ctx.author.id == 810910872792596550:
         await ctx.message.delete()
-        await ctx.send(" ".join(args))
+        await ctx.send(args)
+    else:
+        await ctx.send("Nem használhatod ikszDÉÉÉÉ")
 
 @client.command()
 async def crash(ctx):
@@ -384,7 +387,7 @@ async def gun(ctx, *args):
         await ctx.send(f"Bruh you need to tag someone {ctx.author.mention}!")
     else:
         await ctx.message.delete()
-        await ctx.send(f"<:gun:824614321141186580> HANDS UP {args[0]}, A GUN HAS BEEN POINTED TOWARDS YOU BY {ctx.author.mention}, OBEY THEM NOW!")
+        await ctx.send(f"<:gun:824614321141186580> HANDS UP {args[0]}, {ctx.author.mention} POINTED THEIR GUN AT YOU, OBEY THEM NOW!")
 
 @client.command()
 async def ping(ctx):
@@ -599,7 +602,7 @@ async def _watch(ctx):
         data.close()
         print(f"--------------------\nChanged watch to {watch}\n--------------------")
         await ctx.send(f"Changed watch to {watch}.")
-    
+
 @client.command(aliases=["hájd"])
 async def hide(ctx):  
     await ctx.send(" ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n ឵឵\n")
@@ -627,6 +630,18 @@ async def _giverole(ctx, _id):
         await ctx.send(f"added {role} role to {member}")
     except:
         await ctx.send("nem így kell xddd L")
+
+@client.command(aliases=["athome"])
+async def _athome(ctx):
+    karantenyek = client.get_guild(810938331520434227)
+    member = ctx.author
+    athomeR = get(karantenyek.roles, id=885412285525422090)
+    if not athomeR in ctx.author.roles:
+        await member.add_roles(athomeR)
+        await ctx.send("kaptál rangot uram")
+    else:
+        await member.remove_roles(athomeR)
+        await ctx.send("elvettem a rangot uram")
 
 @client.command(aliases=["aludjá"])
 async def chill(ctx, *args):
@@ -671,6 +686,14 @@ async def banned_words(ctx):
 async def calculate(ctx, *args):
     global operation, result, num1, num2, oper
     if len(args) < 3:
+        if args[0] == "sqrt":
+            root = math.sqrt(float(args[1]))
+            if root - int(root) == 0.0:
+                root = int(root)
+
+            await ctx.send(root)
+            return None
+
         await ctx.send("Minden paramétert írj be lmao")
         return None
 
@@ -693,6 +716,37 @@ async def calculate(ctx, *args):
     print(int(result))
     print(result-int(result))
     await ctx.send(result)
+
+@client.command(aliases=["masodfoku", "masod"])
+async def _masodfoku_egyenlet(ctx, _a, _b, _c):
+    try:
+        _a, _b, _c = int(_a), int(_b), int(_c)
+    except ValueError:
+        await ctx.send("Egyelőre csak egész számokat fogadok el!")
+        return None
+
+    try:
+        gyokos = math.sqrt((_b**2) - (4*_a*_c))
+    except ValueError:
+        await ctx.send("Nincs megoldás!")
+
+    x1 = ((-1*_b)+gyokos)/(2*_a)
+    x2 = ((-1*_b)-gyokos)/(2*_a)
+
+    try:
+        x1 = int(x1)
+    except ValueError:
+        pass
+
+    try:
+        x2 = int(x2)
+    except ValueError:
+        pass    
+    
+    if x1 == x2:
+        await ctx.send(f"A két ág megegyezik: [{x1}]")
+    else:
+        await ctx.send(f"plusz ág: [{x1}], mínusz ág: [{x2}]")
 
 @client.command(aliases=["c"])
 async def clear(ctx, msgs):
@@ -728,6 +782,67 @@ async def dm(ctx, _id, *, message):
     await msg_dm.send(message)
     await ctx.send(f"""Dm-d "{message}" to {user}""")
 
+
+#endregion
+
+#region remote control
+
+@client.command()
+async def click(ctx):
+    if ctx.author.id != 810910872792596550:
+        return None
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
+    time.sleep(0.01)
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
+    time.sleep(0.01)
+    await ctx.send("Clicked!")
+
+@client.command()
+async def left(ctx):
+    if ctx.author.id != 810910872792596550:
+        return None
+    keyboard.press("left_arrow")
+    await ctx.send("Pressed left arrow!")
+
+@client.command()
+async def rewind(ctx):
+    if ctx.author.id != 810910872792596550:
+        return None
+    keyboard.press("j")
+    await ctx.send("Pressed j, rewinded back 10 seconds!")
+
+@client.command()
+async def remote(ctx):
+    pause_resume = Button(label="Pause/Resume", style = discord.ButtonStyle.green, emoji = "▶")
+    rewind = Button(label="Rewind", style = discord.ButtonStyle.blurple, emoji = "⏪")
+    forward = Button(label="Forward", style = discord.ButtonStyle.blurple, emoji = "⏩")
+    fullscreen = Button(label="Fullscreen", style = discord.ButtonStyle.gray, emoji = "💻")
+
+    async def pause_resume_callback(interaction):
+        keyboard.press("space")
+    async def rewind_callback(interaction):
+        keyboard.press("j")
+    async def forward_callback(interaction):
+        keyboard.press("l")
+    async def fullscreen_callback(interaction):
+        keyboard.press("f")
+
+
+    pause_resume.callback = pause_resume_callback
+    rewind.callback = rewind_callback
+    forward.callback = forward_callback
+    fullscreen.callback = fullscreen_callback
+
+    view = View()
+    view.add_item(rewind)
+    view.add_item(pause_resume)
+    view.add_item(forward)
+    view.add_item(fullscreen)
+
+    msg = await ctx.send("TV remote", view=view)
+
+
+    
 #endregion
 
 #region voice commands
@@ -1046,10 +1161,7 @@ async def _audio_files(ctx):
         edit_msg.append(f""""{i}"\n""")
 
     await ctx.send("".join(edit_msg))   
-
-    
-    
-    
+ 
 #endregion
 
 
@@ -1103,7 +1215,12 @@ async def remind_timer():
 @client.event
 async def on_message(message):
     global banned_wordsL
-    if message.author == client.user:
+    allowed_guilds = [826459488340672532, 810938331520434227]
+
+    if message.guild == None:
+        if message.author.id != 810910872792596550:
+            return None
+    elif message.author == client.user or not message.guild.id in allowed_guilds:
         return None
 
     if watch:
@@ -1112,28 +1229,28 @@ async def on_message(message):
 
 
     #region autoreply
-    if message.content.startswith("ping") or message.content.startswith("Ping"):
+    if message.content.lower().startswith("ping"):
         szavak = ["pog", "pong", "bruh", "long", "kong", "loll", "chonk", "this cord"]
         await message.channel.send(f"{random.choice(szavak)} ({round(client.latency*1000)}ms)")
         print("-----------------------\nreplied to ping\n-----------------------")
 
-    if message.content.startswith("pong") or message.content.startswith("Pong"):
+    if message.content.lower().startswith("pong"):
         await message.channel.send(f"ping?? ({round(client.latency*1000)}ms)")
         print("-----------------------\nreplied to pong\n-----------------------")
 
-    if message.content == "f" or message.content == "F":
+    if message.content.lower() == "f":
         await message.channel.send(message.content)
         print("-----------------------\nreplied to f\n-----------------------")
     
-    if message.content == "l" or message.content == "L":
+    if message.content.lower() == "l":
         await message.channel.send(message.content)
         print("-----------------------\nreplied to L\n-----------------------")
 
-    if message.content == "lol" or message.content == "LOL" or message.content == "lOl" or message.content == "LoL":
+    if message.content.lower() == "lol":
         await message.channel.send(message.content)
         print("-----------------------\nreplied to lol\n-----------------------")
 
-    if message.content == "xd" or message.content == "XD" or message.content == "Xd" or message.content == "xD":
+    if message.content.lower() == "xd":
         await message.channel.send(message.content)
         print("-----------------------\nreplied to lol\n-----------------------")         
 
@@ -1153,51 +1270,58 @@ async def on_message(message):
         else:
             await message.channel.send("Egy vérszívó légy aki néha válaszol.")
 
-    szavak = ["geci", "gechi", "fasz", "Fasz", "faszom", "Geci", "GECI", "GECHI", "FASZ", "FASZOM"]
-    if message.content in szavak:
+    szavak = ["geci", "gechi", "fasz", "faszom"]
+    if message.content.lower() in szavak:
         await message.reply("Egyetértek.")
 
-    if message.content == "ű" or message.content == "Ű":
+    if message.content.lower() == "ű":
         await message.channel.send(message.content)
 
-    szavak = ["egyetértek", "Egyetértek", "egyet értek", "Egyet értek", "én is", "Én is"]
+    szavak = ["egyetértek", "egyet értek", "én is"]
     for i in szavak:
-        if i in message.content:
+        if i in message.content.lower():
             await message.reply("Én is.")
             break
 
-    if message.content == "de" or message.content == "igen" or message.content == "De" or message.content == "DE":
+    if message.content.lower() == "de" or message.content.lower() == "igen":
         await message.reply("nem")
-    elif message.content == "nem" or message.content == "Nem" or message.content == "NEM":
+    elif message.content.lower() == "nem":
         await message.reply("de")
+
     szavak = ["nempog", "Nempog"]    
     messageS = message.content.split(" ")
     for i in range(len(messageS)):
         if messageS[i] in szavak:
             await message.channel.send(messageS[i])
             return
-        elif messageS[i] == "pog" or messageS[i] == "POG" or messageS[i] == "Pog" or messageS[i] == "pogw":
+        elif messageS[i].lower() == "pog" or messageS[i].lower() == "pogw":
             if not messageS[i-1] == messageS[i] and not messageS[i-1] == messageS[len(messageS)-1]:
                 await message.channel.send(messageS[i-1] + " " + messageS[i])
             else:
                 await message.channel.send(messageS[i])
             break
 
-    szavak = ["bonk", "Bonk", "BONK"]
-    if message.content in szavak:
+    
+    if message.content.lower() == "bonk":
         await message.reply("GECHI")
 
-    szavak = ["hatos", "HATOS", "Hatos", "6os", "6-os"]
+    szavak = ["hatos", "6os", "6-os"]
     for i in szavak:
-        if i in message.content:
+        if i in message.content.lower():
             await message.reply("Faszt, kilences!")
+
+
+    szavak = ["fekete", "buzi", "náci"]
+    for i in szavak:
+        if i in message.content.lower():
+            await message.reply("ez nem pollkorrekt")
     #endregion
     
     #region autodelete
 
     
     for i in banned_wordsL:
-        if i in message.content and message.channel.id != 810942077272588300:
+        if i in message.content.lower() and message.channel.id != 810942077272588300:
             await message.delete()
             break
 
