@@ -1,6 +1,5 @@
 #region initialization
-
-import os, discord, time, datetime, random, asyncio, math, sys, win32api, win32con, keyboard
+import os, discord, time, datetime, random, asyncio, math, sys, win32api, win32con, keyboard, pyautogui
 
 from discord.ext import commands, tasks
 from discord.ui import Button, View
@@ -21,6 +20,7 @@ testing_mode = False
 client = commands.Bot(command_prefix="?", case_insensitive = True)
 client.remove_command("help")
 
+dev_id = 810910872792596550
 guild_ids = [810938331520434227, 820606404506681345]
 
 def tobool(boolean):
@@ -29,7 +29,7 @@ def tobool(boolean):
     elif boolean == "False":
         return False
 
-
+_retek = "𝕽𝖊𝖙𝖊𝖐"
 
 settings = open(os.getcwd()+"/cecelegy/settings.txt", "r", encoding="utf-8")
 settingsR = settings.read().split("+++")
@@ -102,7 +102,7 @@ async def hello(ctx):
 
 @help.command()
 async def crash(ctx):
-    embed = discord.Embed(title="Help", description = "Crashes the bot, only usable by <@!810910872792596550>", color=theme_color)
+    embed = discord.Embed(title="Help", description = f"Crashes the bot, only usable by <@!{dev_id}>", color=theme_color)
     
     embed.add_field(name = "**Syntax**", value="?crash")
     
@@ -161,7 +161,7 @@ async def hello(ctx):
 
 @client.command(aliases=["szpík", "s"])
 async def speak(ctx, *, args):
-    if ctx.author.id == 810910872792596550:
+    if ctx.author.id == dev_id:
         await ctx.message.delete()
         await ctx.send(args)
     else:
@@ -169,7 +169,7 @@ async def speak(ctx, *, args):
 
 @client.command()
 async def crash(ctx):
-    if ctx.author.id == 810910872792596550:
+    if ctx.author.id == dev_id:
         await ctx.send("Megyek aludni <:killme:822415900606332950>")
         exit()
     else:
@@ -247,11 +247,10 @@ async def _random(ctx, *numbers):
         number = random.randint(first, second)
         await ctx.send(number)
     except ValueError:
-        await ctx.send("Számokat írj be :)")
+        await ctx.send("Számokat írj be (:")
 
 @client.command(aliases=["flip", "coin"])
 async def coinflip(ctx):
-    number = random.randint(1, 2)
     coin = random.choice(["heads", "tails"])
     await ctx.send(coin)
 
@@ -402,7 +401,7 @@ async def shield(ctx):
 @client.command()
 async def cycle(ctx):
     global pfpcycle
-    if ctx.author.id == 810910872792596550:
+    if ctx.author.id == dev_id:
         if pfpcycle:
             pfpcycle = False
         else:
@@ -417,10 +416,10 @@ async def cycle(ctx):
     else:
         await ctx.send(f"{ctx.author.mention}, nem használhatod ezt lmao")
 
-@client.command()
+@client.command(aliases=["theme"])
 async def settheme(ctx, *args):
     global theme_color
-    ids = [810910872792596550, 351427025078190101, 688681949887332437, 810959448935366706, 731865566230609943]
+    ids = [dev_id, 351427025078190101, 688681949887332437, 810959448935366706, 731865566230609943]
     if ctx.author.id in ids:
         karantenyek = client.get_guild(810938331520434227)
         cece_role = get(karantenyek.roles, id=836214251432837130)
@@ -431,8 +430,12 @@ async def settheme(ctx, *args):
 
         colors = ["gold", "tür", "rw", "dc", "og"]
         if args[0] not in colors:
-            await ctx.send(f"""No such color as "{args[0]}"!""")
+            if args[0] == "?":
+                await ctx.send(f"Available themes: {colors}")
+            else:
+                await ctx.send(f"No such color as [{args[0]}]!")
             return None
+
         avatar_changed = False
         if args[0] == "og":
             if avatar:
@@ -499,9 +502,9 @@ async def settheme(ctx, *args):
         data.write(f"{pfpcycle}\n{watch}\n{theme_color}")
         data.close()
         if avatar_changed:
-            await ctx.send(f"Avatar and theme sucessfully changed to {args[0]}")
+            await ctx.send(f"avatar and theme = [{args[0]}]")
         else:
-            await ctx.send(f"Only theme changed to {args[0]}")
+            await ctx.send(f"theme = [{args[0]}]")
     else:
         await ctx.send(f"{ctx.author.mention}, nem használhatod ezt lmao")
 
@@ -510,7 +513,7 @@ async def suggest(ctx, *args):
     suggestions = open(os.getcwd()+"/cecelegy/suggestions.txt", "a+", encoding="utf-8")
     suggestions.write(f"""\n[{" ".join(args)}], suggested by: {ctx.author}""")
     suggestions.close()
-    await ctx.send(f"""Suggested [{" ".join(args)}] to <@!810910872792596550>""")
+    await ctx.send(f"""Suggested [{" ".join(args)}] to <@!{dev_id}>""")
 
 @client.command()
 async def timeleft(ctx):
@@ -548,7 +551,7 @@ async def timeleft(ctx):
 
 @client.command()
 async def refresh(ctx):
-    if ctx.author.id == 810910872792596550:
+    if ctx.author.id == dev_id:
         global remindR, remindR_dupe, banned_wordsL
         remindF = open(os.getcwd()+"/cecelegy/reminder.txt", "r", encoding="utf-8")
         remindR = remindF.read().split("\n")
@@ -572,7 +575,7 @@ async def refresh(ctx):
 async def test(ctx):
     embed=discord.Embed(title="Help", description="Use the commands below with [?] prefix!", color=theme_color)
     embed.add_field(name="hello", value="""Cecelégy answers with "SZIA TE GECHI" """, inline=False)
-    embed.add_field(name="crash", value="Only <@!810910872792596550> can use this, it crashes <@!820613259869814814>", inline=False)
+    embed.add_field(name="crash", value=f"Only <@!{dev_id}> can use this, it crashes <@!820613259869814814>", inline=False)
     embed.add_field(name="random <num> <num2>", value="Generates a number between the two numbers", inline=False)
     embed.add_field(name="coinflip", value="Flips a freaking coin", inline=False)
     embed.add_field(name="gun <@somebody>", value="It SHOOTS the mentioned blithering idiot", inline=True)
@@ -580,7 +583,7 @@ async def test(ctx):
     embed.add_field(name="napivers", value="Shows a new poem every day, made by us :)", inline=False)
     embed.add_field(name="remind <@somebody> <***X***d-***X***h-***X***m-***X***s> <message>", value="Reminds the mentioned blithering idiot", inline=True)
     embed.add_field(name="timeleft", value="Shows you the active reminders", inline=True)
-    embed.add_field(name="suggest <something>", value="Suggest something for <@!810910872792596550> to implement into me :)", inline=False)
+    embed.add_field(name="suggest <something>", value=f"Suggest something for <@!{dev_id}> to implement into me :)", inline=False)
 
 
     embed.add_field(name="Autoreplies", value="ping, pong, f, L LOL, XD, gechi, ű, egyetértek", inline=False)
@@ -590,7 +593,7 @@ async def test(ctx):
 @client.command(aliases=["watch"])
 async def _watch(ctx):
     global watch
-    if ctx.author.id == 810910872792596550:
+    if ctx.author.id == dev_id:
         if watch:
             watch = False
         else:
@@ -601,7 +604,7 @@ async def _watch(ctx):
         data.write(f"{pfpcycle}\n{watch}")
         data.close()
         print(f"--------------------\nChanged watch to {watch}\n--------------------")
-        await ctx.send(f"Changed watch to {watch}.")
+        await ctx.send(f"watch = [{watch}]")
 
 @client.command(aliases=["hájd"])
 async def hide(ctx):  
@@ -609,7 +612,7 @@ async def hide(ctx):
 
 @client.command(aliases=["del"])
 async def _del(ctx, *_id):
-    if ctx.author.id == 810910872792596550:
+    if ctx.author.id == dev_id:
         try:
             if _id[0] == []:
                 return
@@ -627,7 +630,7 @@ async def _giverole(ctx, _id):
         member = ctx.message.author
         role = get(karantenyek.roles, id=int(_id))
         await member.add_roles(role)
-        await ctx.send(f"added {role} role to {member}")
+        await ctx.send(f"added [{role}] role to [{member}]")
     except:
         await ctx.send("nem így kell xddd L")
 
@@ -671,6 +674,21 @@ async def bonk(ctx, *args):
         await ctx.message.delete()
         await ctx.send(f"<:cheems:845344496979935312> {args[0]}, you got bonked by {ctx.author.mention}! <:cheems:845344496979935312>")
 
+@client.command()
+async def shit(ctx, *args):
+    if len(args) == 0:
+        await ctx.send(f"Bruh you need to tag someone {ctx.author.mention}!")
+    elif ctx.author.mention == args[0]:
+        await ctx.send(f"Bruh you can't shit on yourself {ctx.author.mention}!")
+    elif args[0] == "<@!820613259869814814>" or args[0] == "<@820613259869814814>":
+        await ctx.send(f"Bruh you can't shit on me {ctx.author.mention}, I'm too powerful!")
+    elif not args[0].startswith("<@") and args[0] != "@everyone":
+        await ctx.send(f"Bruh you need to tag someone {ctx.author.mention}!")
+    else:
+        await ctx.message.delete()
+        await ctx.send(f"💩 {args[0]}, you just got shit on by {ctx.author.mention}! 💩")
+
+
 @client.command(aliases=["banned"])
 async def banned_words(ctx):
     global banned_wordsL
@@ -686,7 +704,7 @@ async def banned_words(ctx):
 async def calculate(ctx, *args):
     global operation, result, num1, num2, oper
     if len(args) < 3:
-        if args[0] == "sqrt":
+        if args[0].lower() == "sqrt" or args[0].lower() == "gyök" or args[0].lower() == "gyok":
             root = math.sqrt(float(args[1]))
             if root - int(root) == 0.0:
                 root = int(root)
@@ -712,45 +730,163 @@ async def calculate(ctx, *args):
     exec(operation, globals())
     if result - int(result) == 0.0:
         result = int(result)
-    print(result)
-    print(int(result))
-    print(result-int(result))
     await ctx.send(result)
 
 @client.command(aliases=["masodfoku", "masod"])
 async def _masodfoku_egyenlet(ctx, _a, _b, _c):
     try:
-        _a, _b, _c = int(_a), int(_b), int(_c)
+        _a, _b, _c = float(_a), float(_b), float(_c)
     except ValueError:
-        await ctx.send("Egyelőre csak egész számokat fogadok el!")
+        await ctx.send("Számokat írj bruh")
         return None
 
     try:
         gyokos = math.sqrt((_b**2) - (4*_a*_c))
     except ValueError:
         await ctx.send("Nincs megoldás!")
-
-    x1 = ((-1*_b)+gyokos)/(2*_a)
-    x2 = ((-1*_b)-gyokos)/(2*_a)
-
+    
     try:
+        x1 = ((-1*_b)+gyokos)/(2*_a)
+        x2 = ((-1*_b)-gyokos)/(2*_a)
+    except ZeroDivisionError:
+        await ctx.send("Öhm, biztos 0 az [a]? xd")
+
+
+    if x1 - int(x1) == 0.0:
         x1 = int(x1)
-    except ValueError:
-        pass
-
-    try:
+    else:
+        x1 = round(x1, 2)
+    
+    if x2 - int(x2) == 0.0:
         x2 = int(x2)
-    except ValueError:
-        pass    
+    else:
+        x2 = round(x2, 2)
+      
     
     if x1 == x2:
-        await ctx.send(f"A két ág megegyezik: [{x1}]")
+        await ctx.send(f"a két ág megegyezik: [{x1}]")
     else:
         await ctx.send(f"plusz ág: [{x1}], mínusz ág: [{x2}]")
 
+@client.command(aliases=["pitagorasz", "pita", "haromszog", "háromszög"])
+async def _pitagorasz_tetel(ctx, _a, _b, _c):
+    if _a == "?":
+        try:
+            _b, _c = float(_b), float(_c)
+        except ValueError:
+            await ctx.send("Egyelőre csak egész számokat fogadok el!")
+            return None
+
+        try:
+            _a = math.sqrt((_c ** 2) - (_b ** 2))
+            if _a - int(_a) == 0.0:
+                _a = int(_a)
+            
+            await ctx.send(f"a = [{_a}]")
+        except ValueError:
+            await ctx.send("Nincs megoldás!")
+    elif _b == "?":
+        try:
+            _a, _c = float(_a), float(_c)
+        except ValueError:
+            await ctx.send("Egyelőre csak egész számokat fogadok el!")
+            return None
+
+        try:
+            _b = math.sqrt((_c ** 2) - (_a ** 2))
+            if _b - int(_b) == 0.0:
+                _b = int(_b)
+            await ctx.send(f"b = [{_b}]")
+        except ValueError:
+            await ctx.send("Nincs megoldás!")
+    
+    elif _c == "?":
+        try:
+            _a, _b = float(_a), float(_b)
+        except ValueError:
+            await ctx.send("Egyelőre csak egész számokat fogadok el!")
+            return None
+
+        try:
+            _c = math.sqrt((_a ** 2) + (_b ** 2))
+            if _c - int(_c) == 0.0:
+                _c = int(_c)
+            await ctx.send(f"c = [{_c}]")
+        except ValueError:
+            await ctx.send("Nincs megoldás!")
+
+@client.command(aliases=["kör", "karika", "körszámolás"])
+async def _kör_számolás(ctx, _given, _n):
+    if _given == "r" or _given == "s":
+        try:
+            _r = float(_n)
+        except ValueError:
+            await ctx.send("számot írj bruh")
+            return None
+
+        _k = (_r * 2) * 3.14
+
+        _t = (_r ** 2) * 3.14
+
+
+        try:
+            if _k - int(_k) == 0.0:
+                _k = int(_k)
+
+            if _t - int(_t) == 0.0:
+                _t = int(_t)
+            await ctx.send(f"kerület = [{_k}]\nterület = [{_t}]")
+        except ValueError:
+            await ctx.send("Nincs megoldás!")
+    elif _given == "k":
+        try:
+            _k = float(_n)
+        except ValueError:
+            await ctx.send("számot írj bruh")
+            return None
+
+        _r = (_k/2)/3.14
+
+        _t = (_r ** 2) * 3.14
+
+
+        try:
+            if _r - int(_r) == 0.0:
+                _r = int(_r)
+
+            if _t - int(_t) == 0.0:
+                _t = int(_t)
+            await ctx.send(f"sugár = [{_r}]\nterület = [{_t}]")
+        except ValueError:
+            await ctx.send("Nincs megoldás!")
+    
+    elif _given == "t":
+        try:
+            _t = float(_n)
+        except ValueError:
+            await ctx.send("számot írj bruh")
+            return None
+
+        _r = math.sqrt(_t / 3.14)
+
+        _k = (_r * 2) * 3.14
+
+
+        try:
+            if _r - int(_r) == 0.0:
+                _r = int(_r)
+
+            if _k - int(_k) == 0.0:
+                _k = int(_k)
+            await ctx.send(f"sugár = [{_r}]\nterület = [{_k}]")
+        except ValueError:
+            await ctx.send("Nincs megoldás!")
+
+
+
 @client.command(aliases=["c"])
 async def clear(ctx, msgs):
-    if ctx.author.id == 810910872792596550:
+    if ctx.author.id == dev_id:
         try:
             await ctx.channel.purge(limit=int(msgs)+1)
         except ValueError:
@@ -763,8 +899,12 @@ async def github(ctx):
     await ctx.send("https://github.com/VinceDome/Cecelegy")
 
 @client.command()
+async def retek(ctx):
+    await ctx.send(_retek)
+
+@client.command()
 async def dm(ctx, _id, *, message):
-    if ctx.author.id != 810910872792596550:
+    if ctx.author.id != dev_id:
         return None
     if "<@" in _id:
         _idL = list(_id)
@@ -780,7 +920,7 @@ async def dm(ctx, _id, *, message):
     user = await client.fetch_user(int(_id))
     msg_dm = await user.create_dm()
     await msg_dm.send(message)
-    await ctx.send(f"""Dm-d "{message}" to {user}""")
+    await ctx.send(f""" "{message}" sent to [{user}]""")
 
 
 #endregion
@@ -789,7 +929,7 @@ async def dm(ctx, _id, *, message):
 
 @client.command()
 async def click(ctx):
-    if ctx.author.id != 810910872792596550:
+    if ctx.author.id != dev_id:
         return None
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
     time.sleep(0.01)
@@ -799,33 +939,37 @@ async def click(ctx):
 
 @client.command()
 async def left(ctx):
-    if ctx.author.id != 810910872792596550:
+    if ctx.author.id != dev_id:
         return None
-    keyboard.press("left_arrow")
+    keyboard.press_and_release("left_arrow")
+    
     await ctx.send("Pressed left arrow!")
 
 @client.command()
 async def rewind(ctx):
-    if ctx.author.id != 810910872792596550:
+    if ctx.author.id != dev_id:
         return None
-    keyboard.press("j")
+    keyboard.press_and_release("j")
     await ctx.send("Pressed j, rewinded back 10 seconds!")
 
 @client.command()
 async def remote(ctx):
+    if ctx.author.id != dev_id:
+        return None
+
     pause_resume = Button(label="Pause/Resume", style = discord.ButtonStyle.green, emoji = "▶")
     rewind = Button(label="Rewind", style = discord.ButtonStyle.blurple, emoji = "⏪")
     forward = Button(label="Forward", style = discord.ButtonStyle.blurple, emoji = "⏩")
     fullscreen = Button(label="Fullscreen", style = discord.ButtonStyle.gray, emoji = "💻")
 
     async def pause_resume_callback(interaction):
-        keyboard.press("space")
+        keyboard.press_and_release("space")
     async def rewind_callback(interaction):
-        keyboard.press("j")
+        keyboard.press_and_release("j")
     async def forward_callback(interaction):
-        keyboard.press("l")
+        keyboard.press_and_release("l")
     async def fullscreen_callback(interaction):
-        keyboard.press("f")
+        keyboard.press_and_release("f")
 
 
     pause_resume.callback = pause_resume_callback
@@ -841,6 +985,36 @@ async def remote(ctx):
 
     msg = await ctx.send("TV remote", view=view)
 
+@client.command(aliases=["p", "m"])
+async def press(ctx, _button):
+    if ctx.author.id != dev_id:
+        return None
+
+
+    try:
+        
+        if list(ctx.message.content)[1] == "m":
+            if win32api.GetKeyState(win32con.VK_CAPITAL) == 0:
+                keyboard.press_and_release("capslock")
+                macro = True
+
+        keyboard.press(_button)
+        time.sleep(0.1)
+        keyboard.release(_button)
+
+        if _button == "capslock":
+            if win32api.GetKeyState(win32con.VK_CAPITAL) == 1:
+                await ctx.send(f"Pressed caps lock, it's now on!")
+            else:
+                await ctx.send(f"Pressed caps lock, it's now off!")
+        else:
+            if macro:
+                await ctx.send(f"Macro {_button} activated!")
+            else:
+                await ctx.send(f"Pressed {_button}!")
+        
+    except:
+        print("bruh")    
 
     
 #endregion
@@ -1130,7 +1304,7 @@ async def _download(ctx, _url=None, _name=None):
                 edit_msg.append("FAILED\nNOTE: The max video length is around 30 minutes")
                 await msg.edit(content="".join(edit_msg))
                 return None
-                
+             
 
     edit_msg.append("DONE\nRenaming file...")
     await msg.edit(content="".join(edit_msg))
@@ -1214,11 +1388,12 @@ async def remind_timer():
 
 @client.event
 async def on_message(message):
-    global banned_wordsL
+    global operation, result, num1, num2, oper, banned_wordsL
+
     allowed_guilds = [826459488340672532, 810938331520434227]
 
     if message.guild == None:
-        if message.author.id != 810910872792596550:
+        if message.author.id != dev_id:
             return None
     elif message.author == client.user or not message.guild.id in allowed_guilds:
         return None
@@ -1226,7 +1401,11 @@ async def on_message(message):
     if watch:
         print(f"""{message.author} in {message.guild} #{message.channel} sent "{message.content}" """)
 
-
+    for i in banned_wordsL:
+        if i in message.content.lower() and message.channel.id != 810942077272588300:
+            await message.delete()
+            return
+            
 
     #region autoreply
     if message.content.lower().startswith("ping"):
@@ -1263,7 +1442,7 @@ async def on_message(message):
         await message.channel.send("<3")
         print("-----------------------\nreplied to ty\n-----------------------")
     if message.content == "Vince egy isten!":
-        await message.channel.send("Szerintem is! Nagyon kedves <@!810910872792596550>, hogy leprogramozott engem :)")
+        await message.channel.send(f"Szerintem is! Nagyon kedves <@!{dev_id}>, hogy leprogramozott engem :)")
     if message.content.startswith("?ki vagy") or message.content.startswith("?kivagy"):
         if message.author.id == 688681949887332437:
             await message.channel.send("Egy vérszívó gechi aki néha válaszol.")
@@ -1309,7 +1488,13 @@ async def on_message(message):
     for i in szavak:
         if i in message.content.lower():
             await message.reply("Faszt, kilences!")
+            break
 
+    szavak = ["sus", "baka", "amogus", "among us", "amongus", "szász", "száász", "ඞ"]
+    for i in szavak:
+        if i in message.content.lower():
+            await message.reply(random.choice(szavak)+"ඞ")
+            break
 
     szavak = ["fekete", "buzi", "náci"]
     for i in szavak:
@@ -1317,16 +1502,42 @@ async def on_message(message):
             await message.reply("ez nem pollkorrekt")
     #endregion
     
-    #region autodelete
+    
 
     
-    for i in banned_wordsL:
-        if i in message.content.lower() and message.channel.id != 810942077272588300:
-            await message.delete()
-            break
+    
 
+    if not message.content.lower().startswith("?"):
+        args = message.content.split(" ")
+        if len(args) < 3:
+            if args[0].lower() == "sqrt" or args[0].lower() == "gyök" or args[0].lower() == "gyok":
+                root = math.sqrt(float(args[1]))
+                if root - int(root) == 0.0:
+                    root = int(root)
 
-    #endregion
+                await message.channel.send(root)
+                return None
+
+            #await message.send("Minden paramétert írj be lmao")
+            return None
+
+        try:
+            num1 = float(args[0])
+            num2 = float(args[2])
+            oper = args[1]
+        except ValueError:
+            #await message.send("Számokkal számolj!")
+            return None
+
+        if oper == "x" or oper == "X":
+            oper = "*"
+        result = 0
+        operation = "result = num1 "+oper+" num2"
+        exec(operation, globals())
+        if result - int(result) == 0.0:
+            result = int(result)
+        await message.channel.send(result)    
+    
     await client.process_commands(message)
     
 
